@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Palette: Sidi Bou Said blue, terracotta brick, warm sand. */
+@theme {
+  --color-sand-50: #fbf8f3;
+  --color-sand-100: #f4eee3;
+  --color-sand-200: #e9dfcc;
+  --color-sand-300: #d9cbb2;
+
+  --color-ink: #1b2232;
+  --color-ink-soft: #465066;
+  --color-muted: #6b7386;
+
+  --color-azur-50: #edf4fb;
+  --color-azur-100: #d8e6f5;
+  --color-azur-500: #2a6db5;
+  --color-azur-600: #1f5c9e;
+  --color-azur-700: #184a82;
+  --color-azur-800: #133a66;
+  --color-azur-900: #0e2b4c;
+
+  --color-terra-50: #fbefe8;
+  --color-terra-100: #f6dccd;
+  --color-terra-400: #d9794f;
+  --color-terra-500: #c6623a;
+  --color-terra-600: #a94f2d;
+
+  --color-olive-50: #eff4e8;
+  --color-olive-600: #56702f;
+
+  --color-amber-50: #fdf6e3;
+  --color-amber-700: #8a5a0b;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-sand-50);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-terra-100);
+}
