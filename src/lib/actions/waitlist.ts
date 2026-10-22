@@ -1,17 +1,22 @@
 "use server";
 
+import { DEFAULT_LOCALE, hasLocale } from "@/i18n/config";
+import { loadDictionary } from "@/i18n/dictionaries";
 import { createPublicClient } from "@/lib/supabase/public";
 import {
-  COUNTRIES,
+  COUNTRY_CODES,
   EMAIL_PATTERN,
   MODEL_ORDER,
-  TICKET_RANGES,
+  TICKET_RANGE_CODES,
   isOneOf,
-  optionValues,
   type FormState,
 } from "@/lib/domain";
 
 export async function joinWaitlist(_prev: FormState, formData: FormData): Promise<FormState> {
+  const lang = formData.get("lang");
+  const locale = hasLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = (await loadDictionary(locale)).waitlist;
+
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const fullName = String(formData.get("full_name") ?? "").trim().slice(0, 120);
   const residency = formData.get("residency");
@@ -29,12 +34,12 @@ export async function joinWaitlist(_prev: FormState, formData: FormData): Promis
   };
 
   const errors: Record<string, string> = {};
-  if (!EMAIL_PATTERN.test(email) || email.length > 254) errors.email = "Entrez une adresse e-mail valide.";
-  if (!isOneOf(residency, ["resident", "non_resident"] as const)) errors.residency = "Indiquez où vous résidez.";
-  if (residency === "non_resident" && !isOneOf(country, optionValues(COUNTRIES).filter((c) => c !== "TN"))) {
-    errors.country = "Choisissez votre pays de résidence.";
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) errors.email = t.errors.email;
+  if (!isOneOf(residency, ["resident", "non_resident"] as const)) errors.residency = t.errors.residency;
+  if (residency === "non_resident" && !isOneOf(country, COUNTRY_CODES.filter((code) => code !== "TN"))) {
+    errors.country = t.errors.country;
   }
-  if (ticketRange && !isOneOf(ticketRange, optionValues(TICKET_RANGES))) errors.ticket_range = "Montant invalide.";
+  if (ticketRange && !isOneOf(ticketRange, TICKET_RANGE_CODES)) errors.ticket_range = t.errors.ticket;
   if (Object.keys(errors).length > 0) return { status: "error", errors, values };
 
   const { error } = await createPublicClient()
@@ -46,16 +51,13 @@ export async function joinWaitlist(_prev: FormState, formData: FormData): Promis
       country,
       ticket_range: ticketRange || null,
       interests,
-      source: "landing",
+      source: `landing-${locale}`,
     });
 
   // Already on the list counts as success, so the form doesn't reveal who signed up.
   if (error && error.code !== "23505") {
-    return { status: "error", message: "L'inscription n'a pas abouti. Réessayez dans un instant.", values };
+    return { status: "error", message: t.errors.failed, values };
   }
 
-  return {
-    status: "success",
-    message: "C'est noté ! Vous serez parmi les premiers informés de l'ouverture des projets.",
-  };
+  return { status: "success", message: t.success };
 }

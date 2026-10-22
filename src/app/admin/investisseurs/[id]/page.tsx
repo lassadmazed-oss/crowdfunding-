@@ -4,15 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StatusBadge } from "@/components/project-card";
 import { getAdminInvestor, getInvestorIntents, requireAdmin } from "@/lib/admin";
-import {
-  ASSET_RANGES,
-  COUNTRIES,
-  EXPERIENCE_LEVELS,
-  INCOME_RANGES,
-  formatDate,
-  formatTND,
-  labelOf,
-} from "@/lib/domain";
+import { labelFor } from "@/lib/domain";
+import { formatDate, formatTND, labels } from "../../admin-i18n";
 import { EmptyRow, KycBadge, Table, TableSkeleton, formatDateTime } from "../../admin-ui";
 import { ReviewForm } from "./review-form";
 
@@ -56,12 +49,12 @@ async function InvestorDetail({ params }: Pick<PageProps<"/admin/investisseurs/[
     { label: "Profession", value: investor.profession ?? "—" },
     {
       label: "Résidence",
-      value: investor.residency === "non_resident" ? `Étranger · ${labelOf(COUNTRIES, investor.country)}` : investor.residency ? "Tunisie" : "—",
+      value: investor.residency === "non_resident" ? `Étranger · ${labelFor(labels.countries, investor.country)}` : investor.residency ? "Tunisie" : "—",
     },
     { label: "Ville", value: investor.city ?? "—" },
-    { label: "Revenus annuels", value: labelOf(INCOME_RANGES, investor.annual_income_range) },
-    { label: "Épargne disponible", value: labelOf(ASSET_RANGES, investor.investable_assets_range) },
-    { label: "Expérience", value: labelOf(EXPERIENCE_LEVELS, investor.experience_level) },
+    { label: "Revenus annuels", value: labelFor(labels.incomeRanges, investor.annual_income_range) },
+    { label: "Épargne disponible", value: labelFor(labels.assetRanges, investor.investable_assets_range) },
+    { label: "Expérience", value: labelFor(labels.experience, investor.experience_level) },
     { label: "Préférence sukuk", value: investor.prefers_sukuk ? "Oui" : "Non" },
     {
       label: "Risques reconnus le",
@@ -103,7 +96,7 @@ async function InvestorDetail({ params }: Pick<PageProps<"/admin/investisseurs/[
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={intent.project.status} />
+                    <StatusBadge status={intent.project.status} label={labels.statuses[intent.project.status]} />
                   </td>
                   <td className="px-4 py-3 font-semibold whitespace-nowrap">{formatTND(intent.amount)}</td>
                   <td className="px-4 py-3 text-xs whitespace-nowrap text-muted">{formatDateTime(intent.created_at)}</td>

@@ -6,7 +6,7 @@ import { ConfirmButton } from "@/components/confirm-button";
 import { StatusBadge } from "@/components/project-card";
 import { deleteProject } from "@/lib/actions/admin";
 import { getAdminProject, getProjectIntents, requireAdmin } from "@/lib/admin";
-import { formatTND } from "@/lib/domain";
+import { formatTND, labels } from "../../admin-i18n";
 import { EmptyRow, KycBadge, Table, TableSkeleton, formatDateTime } from "../../admin-ui";
 import { ProjectForm } from "../project-form";
 
@@ -39,12 +39,12 @@ async function EditProject({ params, searchParams }: Pick<PageProps<"/admin/proj
         <div>
           <h1 className="font-display text-3xl font-semibold text-azur-900">{project.title}</h1>
           <p className="mt-2 flex items-center gap-3 text-sm text-muted">
-            <StatusBadge status={project.status} />
+            <StatusBadge status={project.status} label={labels.statuses[project.status]} />
             Modifié le {formatDateTime(project.updated_at)}
           </p>
         </div>
         {project.status !== "draft" ? (
-          <Link href={`/projets/${project.slug}`} target="_blank" className="text-sm font-medium text-azur-700">
+          <Link href={`/fr/projets/${project.slug}`} target="_blank" className="text-sm font-medium text-azur-700">
             Voir sur le site ↗
           </Link>
         ) : null}

@@ -1,0 +1,62 @@
+{
+  "residence-yasmine-ennasr": {
+    "title": "Résidence Yasmine",
+    "tagline": "Finanziare il completamento di 24 appartamenti a Ennasr",
+    "description": "Le opere strutturali sono terminate e il 60% delle unità è già prenotato. I fondi integrano il capitale proprio richiesto dalla banca per finanziare le finiture. Gli investitori vengono rimborsati alla vendita degli appartamenti.",
+    "highlights": [
+      "Opere strutturali terminate",
+      "60% delle unità prenotate",
+      "Ipoteca di primo grado (prevista)"
+    ],
+    "risks": [
+      "Ritardi nel cantiere o nelle vendite",
+      "Insolvenza del promotore",
+      "Capitale non garantito, nessuna rivendita prima della scadenza"
+    ]
+  },
+  "dar-diaspora-sahloul": {
+    "title": "Dar Diaspora — Sahloul",
+    "tagline": "6 appartamenti arredati in affitto vicino alle università di Sousse",
+    "description": "Una società di progetto acquista sei appartamenti e li affitta a studenti e giovani lavoratori. I canoni netti vengono distribuiti ogni anno; alla scadenza gli appartamenti vengono rivenduti.",
+    "highlights": [
+      "Forte domanda di affitti da parte degli studenti",
+      "Gestione degli affitti affidata a terzi",
+      "Accessibile ai tunisini residenti all'estero"
+    ],
+    "risks": [
+      "Periodi di sfitto",
+      "Calo dei prezzi alla rivendita",
+      "Rischio di cambio per gli investitori non residenti"
+    ]
+  },
+  "sakan-step-sfax": {
+    "title": "Sakan Step — Sfax El Jadida",
+    "tagline": "Tre famiglie diventano proprietarie passo dopo passo",
+    "description": "La società acquista tre appartamenti. Ogni famiglia paga un canone e riscatta delle quote ogni mese, fino a diventarne pienamente proprietaria. Struttura in sukuk, conforme alla finanza islamica.",
+    "highlights": [
+      "Accesso alla proprietà senza mutuo bancario",
+      "Entrate regolari",
+      "Struttura sukuk"
+    ],
+    "risks": [
+      "Mancato pagamento da parte di una famiglia",
+      "Quadro giuridico dell'affitto con riscatto da verificare",
+      "Durata lunga (10 anni)"
+    ]
+  },
+  "dar-medina-tunis": {
+    "title": "Dar Lebna — Medina di Tunisi",
+    "tagline": "Restaurare una casa tradizionale e trasformarla in guest house",
+    "description": "Restauro di una dar del XIX secolo, trasformata in una guest house di 8 camere e gestita da un operatore specializzato. Gli investitori ricevono una quota del risultato di gestione.",
+    "highlights": [
+      "Patrimonio architettonico",
+      "Turismo culturale in crescita",
+      "Gestore esperto"
+    ],
+    "risks": [
+      "Stagionalità del turismo",
+      "Superamento del budget di restauro",
+      "Autorizzazioni per la tutela del patrimonio"
+    ]
+  }
+}

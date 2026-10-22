@@ -5,7 +5,8 @@ import { ConfirmButton } from "@/components/confirm-button";
 import { inputClass, secondaryButtonClass } from "@/components/ui";
 import { deleteWaitlistEntry } from "@/lib/actions/admin";
 import { WAITLIST_PAGE_SIZE, getWaitlist, requireAdmin } from "@/lib/admin";
-import { COUNTRIES, MODELS, TICKET_RANGES, isOneOf, labelOf, type ProjectModel } from "@/lib/domain";
+import { isOneOf, labelFor, type ProjectModel } from "@/lib/domain";
+import { labels } from "../admin-i18n";
 import { EmptyRow, PageTitle, Table, TableSkeleton, formatDateTime } from "../admin-ui";
 
 export const metadata: Metadata = { title: "Liste d'attente" };
@@ -17,7 +18,8 @@ export default function WaitlistPage(props: PageProps<"/admin/liste-attente">) {
         title="Liste d'attente"
         description="Personnes inscrites depuis la page d'accueil."
         action={
-          <a href="/admin/liste-attente/export" className={secondaryButtonClass}>
+          // A file download from a Route Handler, not a page, so a plain <a> rather than <Link>.
+          <a href="/admin/liste-attente/export" download className={secondaryButtonClass}>
             Exporter en CSV
           </a>
         }
@@ -85,14 +87,14 @@ async function WaitlistTable({ searchParams }: Pick<PageProps<"/admin/liste-atte
                 {entry.full_name ? <span className="block text-xs text-muted">{entry.full_name}</span> : null}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-ink-soft">
-                {entry.residency === "resident" ? "Tunisie" : labelOf(COUNTRIES, entry.country)}
+                {entry.residency === "resident" ? "Tunisie" : labelFor(labels.countries, entry.country)}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-ink-soft">
-                {entry.ticket_range ? labelOf(TICKET_RANGES, entry.ticket_range) : "—"}
+                {entry.ticket_range ? labelFor(labels.ticketRanges, entry.ticket_range) : "—"}
               </td>
               <td className="px-4 py-3 text-xs text-ink-soft">
                 {entry.interests.length > 0
-                  ? entry.interests.map((model) => MODELS[model as ProjectModel]?.label ?? model).join(", ")
+                  ? entry.interests.map((model) => labels.models[model as ProjectModel]?.label ?? model).join(", ")
                   : "—"}
               </td>
               <td className="px-4 py-3 text-xs whitespace-nowrap text-muted">{formatDateTime(entry.created_at)}</td>

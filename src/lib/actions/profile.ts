@@ -1,15 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { DEFAULT_LOCALE, hasLocale } from "@/i18n/config";
+import { loadDictionary } from "@/i18n/dictionaries";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
-  ASSET_RANGES,
-  COUNTRIES,
-  EXPERIENCE_LEVELS,
-  INCOME_RANGES,
+  ASSET_RANGE_CODES,
+  COUNTRY_CODES,
+  EXPERIENCE_CODES,
+  INCOME_RANGE_CODES,
   isOneOf,
-  optionValues,
   type FormState,
 } from "@/lib/domain";
 
@@ -24,8 +25,11 @@ function isAdult(birthDate: string) {
 }
 
 export async function saveProfile(_prev: FormState, formData: FormData): Promise<FormState> {
+  const lang = formData.get("lang");
+  const locale = hasLocale(lang) ? lang : DEFAULT_LOCALE;
   const user = await getCurrentUser();
-  if (!user) redirect("/connexion?next=/espace/profil");
+  if (!user) redirect(`/${locale}/connexion?next=/${locale}/espace/profil`);
+  const t = (await loadDictionary(locale)).profile.errors;
 
   const field = (name: string, max = 120) => String(formData.get(name) ?? "").trim().slice(0, max);
   const values = {
@@ -44,23 +48,19 @@ export async function saveProfile(_prev: FormState, formData: FormData): Promise
   };
 
   const errors: Record<string, string> = {};
-  if (values.full_name.length < 3) errors.full_name = "Entrez votre nom complet.";
-  if (!PHONE_PATTERN.test(values.phone)) errors.phone = "Numéro invalide (ex. +216 20 123 456).";
-  if (!isAdult(values.birth_date)) errors.birth_date = "Vous devez avoir au moins 18 ans.";
-  if (!isOneOf(values.residency, ["resident", "non_resident"] as const)) errors.residency = "Indiquez où vous résidez.";
-  if (!isOneOf(values.country, optionValues(COUNTRIES))) errors.country = "Choisissez un pays.";
-  if (values.residency === "non_resident" && values.country === "TN") {
-    errors.country = "Indiquez votre pays de résidence à l'étranger.";
-  }
-  if (values.profession.length < 2) errors.profession = "Indiquez votre profession.";
-  if (!isOneOf(values.annual_income_range, optionValues(INCOME_RANGES))) errors.annual_income_range = "Choisissez une tranche.";
-  if (!isOneOf(values.investable_assets_range, optionValues(ASSET_RANGES))) {
-    errors.investable_assets_range = "Choisissez une tranche.";
-  }
-  if (!isOneOf(values.experience_level, optionValues(EXPERIENCE_LEVELS))) errors.experience_level = "Choisissez une réponse.";
-  if (values.risk_ack !== "on") errors.risk_ack = "Vous devez reconnaître ces risques pour continuer.";
+  if (values.full_name.length < 3) errors.full_name = t.fullName;
+  if (!PHONE_PATTERN.test(values.phone)) errors.phone = t.phone;
+  if (!isAdult(values.birth_date)) errors.birth_date = t.birthDate;
+  if (!isOneOf(values.residency, ["resident", "non_resident"] as const)) errors.residency = t.residency;
+  if (!isOneOf(values.country, COUNTRY_CODES)) errors.country = t.country;
+  if (values.residency === "non_resident" && values.country === "TN") errors.country = t.countryAbroad;
+  if (values.profession.length < 2) errors.profession = t.profession;
+  if (!isOneOf(values.annual_income_range, INCOME_RANGE_CODES)) errors.annual_income_range = t.income;
+  if (!isOneOf(values.investable_assets_range, ASSET_RANGE_CODES)) errors.investable_assets_range = t.assets;
+  if (!isOneOf(values.experience_level, EXPERIENCE_CODES)) errors.experience_level = t.experience;
+  if (values.risk_ack !== "on") errors.risk_ack = t.risk;
   if (Object.keys(errors).length > 0) {
-    return { status: "error", message: "Certains champs sont à corriger.", errors, values };
+    return { status: "error", message: t.form, errors, values };
   }
 
   const supabase = await createClient();
@@ -88,7 +88,7 @@ export async function saveProfile(_prev: FormState, formData: FormData): Promise
       risk_acknowledged_at: current?.risk_acknowledged_at ?? new Date().toISOString(),
     })
     .eq("id", user.id);
-  if (error) return { status: "error", message: "L'enregistrement a échoué. Réessayez.", values };
+  if (error) return { status: "error", message: t.failed, values };
 
-  redirect("/espace?profil=enregistre");
+  redirect(`/${locale}/espace?profil=enregistre`);
 }

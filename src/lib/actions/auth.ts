@@ -1,26 +1,24 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { DEFAULT_LOCALE, hasLocale } from "@/i18n/config";
+import { loadDictionary, type Dictionary } from "@/i18n/dictionaries";
+import { fill } from "@/i18n/format";
 import { createClient } from "@/lib/supabase/server";
 import { EMAIL_PATTERN, isOneOf, safeNextPath, type FormState } from "@/lib/domain";
 
-const AUTH_ERRORS: Record<string, string> = {
-  user_already_exists: "Un compte existe déjà avec cet e-mail. Connectez-vous.",
-  email_exists: "Un compte existe déjà avec cet e-mail. Connectez-vous.",
-  weak_password: "Mot de passe trop faible : au moins 8 caractères, avec des lettres et des chiffres.",
-  over_email_send_rate_limit: "Trop d'e-mails envoyés. Réessayez dans quelques minutes.",
-  over_request_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
-  invalid_credentials: "E-mail ou mot de passe incorrect.",
-  email_not_confirmed: "Confirmez d'abord votre adresse via le lien reçu par e-mail.",
-  email_address_invalid: "Cette adresse e-mail n'est pas acceptée.",
-  signup_disabled: "Les inscriptions sont fermées pour le moment.",
-};
+function localeOf(formData: FormData) {
+  const lang = formData.get("lang");
+  return hasLocale(lang) ? lang : DEFAULT_LOCALE;
+}
 
-function authErrorMessage(code: string | undefined) {
-  return (code && AUTH_ERRORS[code]) || "Une erreur est survenue. Réessayez.";
+function authErrorMessage(t: Dictionary["authErrors"], code: string | undefined) {
+  return (code && code in t ? t[code as keyof typeof t] : undefined) ?? t.generic;
 }
 
 export async function signUp(_prev: FormState, formData: FormData): Promise<FormState> {
+  const locale = localeOf(formData);
+  const t = await loadDictionary(locale);
   const fullName = String(formData.get("full_name") ?? "").trim().slice(0, 120);
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
@@ -28,11 +26,11 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   const values = { full_name: fullName, email, residency: String(residency ?? "") };
 
   const errors: Record<string, string> = {};
-  if (fullName.length < 3) errors.full_name = "Entrez votre nom complet.";
-  if (!EMAIL_PATTERN.test(email)) errors.email = "Entrez une adresse e-mail valide.";
-  if (password.length < 8) errors.password = "8 caractères minimum.";
-  if (!isOneOf(residency, ["resident", "non_resident"] as const)) errors.residency = "Indiquez où vous résidez.";
-  if (formData.get("consent") !== "on") errors.consent = "Cette confirmation est nécessaire.";
+  if (fullName.length < 3) errors.full_name = t.signup.errors.fullName;
+  if (!EMAIL_PATTERN.test(email)) errors.email = t.signup.errors.email;
+  if (password.length < 8) errors.password = t.signup.errors.password;
+  if (!isOneOf(residency, ["resident", "non_resident"] as const)) errors.residency = t.signup.errors.residency;
+  if (formData.get("consent") !== "on") errors.consent = t.signup.errors.consent;
   if (Object.keys(errors).length > 0) return { status: "error", errors, values };
 
   const supabase = await createClient();
@@ -40,39 +38,38 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     email,
     password,
     options: {
-      data: { full_name: fullName, residency },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/confirm?next=/espace/profil`,
+      data: { full_name: fullName, residency, locale },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/confirm?next=/${locale}/espace/profil`,
     },
   });
-  if (error) return { status: "error", message: authErrorMessage(error.code), values };
+  if (error) return { status: "error", message: authErrorMessage(t.authErrors, error.code), values };
 
   // With e-mail confirmation turned off in Supabase, the account is usable right away.
-  if (data.session) redirect("/espace/profil");
+  if (data.session) redirect(`/${locale}/espace/profil`);
 
-  return {
-    status: "success",
-    message: `Un e-mail de confirmation a été envoyé à ${email}. Cliquez sur le lien pour activer votre compte.`,
-  };
+  return { status: "success", message: fill(t.signup.success, { email }) };
 }
 
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
+  const locale = localeOf(formData);
+  const t = await loadDictionary(locale);
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const next = safeNextPath(formData.get("next"), "/espace");
+  const next = safeNextPath(formData.get("next"), `/${locale}/espace`);
 
   if (!EMAIL_PATTERN.test(email) || !password) {
-    return { status: "error", message: "Entrez votre e-mail et votre mot de passe.", values: { email } };
+    return { status: "error", message: t.login.missing, values: { email } };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { status: "error", message: authErrorMessage(error.code), values: { email } };
+  if (error) return { status: "error", message: authErrorMessage(t.authErrors, error.code), values: { email } };
 
   redirect(next);
 }
 
-export async function signOut() {
+export async function signOut(formData: FormData) {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/");
+  redirect(`/${localeOf(formData)}`);
 }

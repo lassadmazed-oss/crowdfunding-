@@ -1,15 +1,8 @@
 import Link from "next/link";
-import {
-  INSTRUMENTS,
-  MODELS,
-  STATUSES,
-  formatDuration,
-  formatTND,
-  type Project,
-  type ProjectInterest,
-  type ProjectModel,
-  type ProjectStatus,
-} from "@/lib/domain";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/fr";
+import { fill, formatDuration, formatNumber, formatTND, pluralize } from "@/i18n/format";
+import type { Project, ProjectInterest, ProjectModel, ProjectStatus } from "@/lib/domain";
 
 const COVER_TONES: Record<ProjectModel, string> = {
   developer_financing: "from-azur-700 via-azur-600 to-azur-500",
@@ -30,7 +23,7 @@ export function ProjectCover({ model, className = "h-40" }: { model: ProjectMode
         </defs>
         <rect width="100%" height="100%" fill={`url(#bricks-${model})`} />
       </svg>
-      <svg viewBox="0 0 200 80" className="absolute right-4 bottom-0 h-3/4 opacity-90" fill="white">
+      <svg viewBox="0 0 200 80" className="absolute end-4 bottom-0 h-3/4 opacity-90" fill="white">
         <rect x="20" y="30" width="40" height="50" opacity="0.85" />
         <rect x="64" y="10" width="46" height="70" />
         <rect x="114" y="40" width="34" height="40" opacity="0.7" />
@@ -48,27 +41,39 @@ const STATUS_TONES: Record<ProjectStatus, string> = {
   closed: "bg-sand-200 text-ink-soft",
 };
 
-export function StatusBadge({ status }: { status: ProjectStatus }) {
+export function StatusBadge({ status, label }: { status: ProjectStatus; label: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_TONES[status]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${STATUS_TONES[status]}`}
+    >
       {status === "open" ? <span className="size-1.5 rounded-full bg-olive-600" /> : null}
-      {STATUSES[status]}
+      {label}
     </span>
   );
 }
 
-export function DemoBadge() {
+export function DemoBadge({ label, title }: { label: string; title: string }) {
   return (
     <span
       className="inline-flex rounded-full border border-dashed border-ink-soft/40 bg-white/80 px-2.5 py-1 text-xs font-medium text-ink-soft"
-      title="Projet fictif présenté à titre d'illustration"
+      title={title}
     >
-      Exemple
+      {label}
     </span>
   );
 }
 
-export function InterestBar({ interest, target }: { interest?: ProjectInterest; target: number }) {
+export function InterestBar({
+  interest,
+  target,
+  locale,
+  t,
+}: {
+  interest?: ProjectInterest;
+  target: number;
+  locale: Locale;
+  t: Dictionary;
+}) {
   const total = interest?.totalAmount ?? 0;
   const percent = Math.min(100, Math.round((total / target) * 100));
   return (
@@ -76,50 +81,68 @@ export function InterestBar({ interest, target }: { interest?: ProjectInterest; 
       <div className="h-2 overflow-hidden rounded-full bg-sand-200">
         <div className="h-full rounded-full bg-terra-500" style={{ width: `${Math.max(percent, total > 0 ? 2 : 0)}%` }} />
       </div>
-      <p className="flex justify-between text-xs text-muted">
+      <p className="flex justify-between gap-2 text-xs text-muted">
         <span>
-          <strong className="font-semibold text-ink">{formatTND(total)}</strong> d&apos;intentions
-          {interest ? ` · ${interest.investorCount} investisseur${interest.investorCount > 1 ? "s" : ""}` : ""}
+          {fill(t.project.intents, { amount: formatTND(total, locale) })}
+          {interest ? ` · ${pluralize(t.project.investors, interest.investorCount, locale)}` : ""}
         </span>
-        <span>{percent} %</span>
+        <span>{formatNumber(percent, locale)} %</span>
       </p>
     </div>
   );
 }
 
-export function ProjectCard({ project, interest }: { project: Project; interest?: ProjectInterest }) {
+// `project` must already be localized (see localizeProject).
+export function ProjectCard({
+  project,
+  interest,
+  locale,
+  t,
+}: {
+  project: Project;
+  interest?: ProjectInterest;
+  locale: Locale;
+  t: Dictionary;
+}) {
   return (
     <Link
-      href={`/projets/${project.slug}`}
+      href={`/${locale}/projets/${project.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative">
         <ProjectCover model={project.model} />
-        <div className="absolute top-3 left-3 flex gap-2">
-          <StatusBadge status={project.status} />
-          {project.is_demo ? <DemoBadge /> : null}
+        <div className="absolute start-3 top-3 flex gap-2">
+          <StatusBadge status={project.status} label={t.labels.statuses[project.status]} />
+          {project.is_demo ? <DemoBadge label={t.common.exampleBadge} title={t.common.exampleBadgeTitle} /> : null}
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="space-y-1">
           <p className="text-xs font-semibold tracking-wide text-terra-500 uppercase">
-            {MODELS[project.model].label} · {project.city}
+            {t.labels.models[project.model].label} · {project.city}
           </p>
           <h3 className="font-display text-xl font-semibold text-ink group-hover:text-azur-700">{project.title}</h3>
           {project.tagline ? <p className="text-sm leading-relaxed text-muted">{project.tagline}</p> : null}
         </div>
         <dl className="grid grid-cols-3 gap-2 rounded-xl bg-sand-50 p-3 text-center">
-          <Figure label="Objectif" value={formatTND(project.target_amount)} />
+          <Figure label={t.project.target} value={formatTND(project.target_amount, locale)} />
           <Figure
-            label="Rendement cible"
-            value={project.target_return_pct != null ? `${project.target_return_pct} %/an` : "—"}
+            label={t.project.targetReturn}
+            value={
+              project.target_return_pct != null
+                ? fill(t.project.perYearShort, { n: formatNumber(project.target_return_pct, locale) })
+                : "—"
+            }
           />
-          <Figure label="Durée" value={project.duration_months ? formatDuration(project.duration_months) : "—"} />
+          <Figure
+            label={t.project.duration}
+            value={project.duration_months ? formatDuration(project.duration_months, locale, t.project) : "—"}
+          />
         </dl>
         <div className="mt-auto space-y-3">
-          <InterestBar interest={interest} target={project.target_amount} />
+          <InterestBar interest={interest} target={project.target_amount} locale={locale} t={t} />
           <p className="text-xs text-muted">
-            {INSTRUMENTS[project.instrument]} · dès {formatTND(project.min_ticket)}
+            {t.labels.instruments[project.instrument]} · {fill(t.project.from, { amount: formatTND(project.min_ticket, locale) })}
           </p>
         </div>
       </div>

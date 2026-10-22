@@ -3,16 +3,23 @@
 import { useActionState } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Field, FormMessage, inputClass } from "@/components/ui";
+import { LOCALE_INFO, type Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/fr";
+import { fill, formatTND } from "@/i18n/format";
 import { saveIntent, withdrawIntent } from "@/lib/actions/intents";
-import { formatTND, idleState } from "@/lib/domain";
+import { idleState } from "@/lib/domain";
 
 export function IntentForm({
+  locale,
+  t,
   projectId,
   slug,
   minTicket,
   targetAmount,
   currentAmount,
 }: {
+  locale: Locale;
+  t: Dictionary["intent"];
   projectId: string;
   slug: string;
   minTicket: number;
@@ -26,22 +33,23 @@ export function IntentForm({
     <div className="space-y-4">
       {currentAmount != null ? (
         <p className="rounded-xl bg-azur-50 px-4 py-3 text-azur-800">
-          Vous avez déclaré <strong>{formatTND(currentAmount)}</strong>. Vous pouvez modifier ou retirer cette
-          intention à tout moment.
+          {fill(t.current, { amount: formatTND(currentAmount, locale) })}
         </p>
       ) : null}
       <form action={formAction} className="space-y-3">
+        <input type="hidden" name="lang" value={locale} />
         <input type="hidden" name="slug" value={slug} />
         <Field
-          label="Montant envisagé (DT)"
+          label={fill(t.amountLabel, { currency: LOCALE_INFO[locale].currency })}
           htmlFor="intent-amount"
           error={state.errors?.amount}
-          hint={`Entre ${formatTND(minTicket)} et ${formatTND(targetAmount)}`}
+          hint={fill(t.amountHint, { min: formatTND(minTicket, locale), max: formatTND(targetAmount, locale) })}
         >
           <input
             id="intent-amount"
             name="amount"
             type="number"
+            dir="ltr"
             inputMode="numeric"
             min={minTicket}
             max={targetAmount}
@@ -53,16 +61,16 @@ export function IntentForm({
           />
         </Field>
         <FormMessage status={state.status} message={state.message} />
-        <SubmitButton pendingLabel="Enregistrement…" className="w-full">
-          {currentAmount != null ? "Mettre à jour" : "Déclarer mon intention"}
+        <SubmitButton pendingLabel={t.saving} className="w-full">
+          {currentAmount != null ? t.update : t.declare}
         </SubmitButton>
-        <p className="text-xs text-muted">Non engageante : aucun paiement ne vous sera demandé avant l&apos;agrément.</p>
+        <p className="text-xs text-muted">{t.nonBinding}</p>
       </form>
       {currentAmount != null ? (
         <form action={withdrawIntent}>
           <input type="hidden" name="project_id" value={projectId} />
           <button type="submit" className="w-full text-sm font-medium text-terra-600 hover:underline">
-            Retirer mon intention
+            {t.withdraw}
           </button>
         </form>
       ) : null}

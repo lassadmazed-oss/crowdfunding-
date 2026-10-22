@@ -15,14 +15,27 @@ npm run dev
 
 Les variables sont dans `.env` (non versionné ; modèle dans `.env.example`).
 
+## Langues
+
+Le site public existe en **arabe** (de droite à gauche), **français**, **anglais**, **allemand** et **italien** :
+`/ar`, `/fr`, `/en`, `/de`, `/it`. La langue est choisie d'après le navigateur, puis mémorisée (cookie)
+quand le visiteur change de langue avec le sélecteur du menu. Le back-office reste en français.
+
+- Textes de l'interface : `src/i18n/dictionaries/` (`fr.ts` est la référence ; les autres fichiers doivent avoir
+  exactement les mêmes clés, TypeScript le vérifie).
+- Textes des projets : saisis en français dans le back-office, avec une section « Traductions » par langue.
+  Un champ laissé vide affiche le texte français.
+- Les e-mails envoyés par Supabase (confirmation d'inscription) restent dans la langue configurée dans
+  Supabase (Authentication → Emails → Templates).
+
 ## Pages
 
 | Route | Contenu |
 | --- | --- |
-| `/` | Accueil, chiffres du marché, modèles, liste d'attente |
-| `/projets`, `/projets/[slug]` | Catalogue filtrable et fiche projet avec déclaration d'intention |
-| `/inscription`, `/connexion` | Compte investisseur (e-mail + mot de passe) |
-| `/espace`, `/espace/profil` | Tableau de bord, intentions, questionnaire investisseur |
+| `/[lang]` | Accueil, chiffres du marché, modèles, liste d'attente |
+| `/[lang]/projets`, `/[lang]/projets/[slug]` | Catalogue filtrable et fiche projet avec déclaration d'intention |
+| `/[lang]/inscription`, `/[lang]/connexion` | Compte investisseur (e-mail + mot de passe) |
+| `/[lang]/espace`, `/[lang]/espace/profil` | Tableau de bord, intentions, questionnaire investisseur |
 | `/auth/confirm` | Retour des liens envoyés par e-mail par Supabase |
 | `/admin` | Back-office (réservé aux administrateurs, voir ci-dessous) |
 

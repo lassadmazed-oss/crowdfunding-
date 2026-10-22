@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { getAdminInvestors, getAdminStats, getWaitlist, requireAdmin } from "@/lib/admin";
-import { COUNTRIES, formatTND, labelOf } from "@/lib/domain";
+import { labelFor } from "@/lib/domain";
+import { formatTND, labels } from "./admin-i18n";
 import { PageTitle, TableSkeleton, formatDateTime } from "./admin-ui";
 
 export default function AdminDashboardPage() {
@@ -115,7 +116,7 @@ async function Dashboard() {
                   <span>
                     <span className="block font-medium text-ink">{entry.email}</span>
                     <span className="block text-xs text-muted">
-                      {labelOf(COUNTRIES, entry.country)}
+                      {labelFor(labels.countries, entry.country)}
                       {entry.full_name ? ` · ${entry.full_name}` : ""}
                     </span>
                   </span>

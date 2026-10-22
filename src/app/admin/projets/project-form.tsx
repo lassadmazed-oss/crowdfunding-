@@ -5,7 +5,11 @@ import { SubmitButton } from "@/components/submit-button";
 import { Field, FormMessage, inputClass } from "@/components/ui";
 import { saveProject } from "@/lib/actions/admin";
 import type { AdminProject } from "@/lib/admin";
-import { GOVERNORATES, INSTRUMENTS, MODELS, MODEL_ORDER, STATUSES, STATUS_ORDER, idleState } from "@/lib/domain";
+import { CONTENT_LOCALE, LOCALES, LOCALE_INFO, type Locale } from "@/i18n/config";
+import { GOVERNORATES, MODEL_ORDER, STATUS_ORDER, idleState, type ProjectText } from "@/lib/domain";
+import { labels } from "../admin-i18n";
+
+const TRANSLATED_LOCALES = LOCALES.filter((locale) => locale !== CONTENT_LOCALE);
 
 const STATUS_HINTS: Record<string, string> = {
   draft: "Invisible sur le site",
@@ -22,7 +26,10 @@ export function ProjectForm({ project }: { project?: AdminProject }) {
   const value = (name: string): string => {
     if (state.values && name in state.values) return String(state.values[name] ?? "");
     if (!project) return "";
-    const saved = project[name as keyof AdminProject];
+    const translated = name.match(/^tr_(\w+?)_(\w+)$/);
+    const saved = translated
+      ? project.translations?.[translated[1] as Locale]?.[translated[2] as keyof ProjectText]
+      : project[name as keyof AdminProject];
     if (Array.isArray(saved)) return saved.join("\n");
     if (typeof saved === "boolean") return saved ? "on" : "";
     return saved == null ? "" : String(saved);
@@ -97,7 +104,7 @@ export function ProjectForm({ project }: { project?: AdminProject }) {
               <option value="">Choisir…</option>
               {MODEL_ORDER.map((model) => (
                 <option key={model} value={model}>
-                  {MODELS[model].label}
+                  {labels.models[model].label}
                 </option>
               ))}
             </select>
@@ -105,7 +112,7 @@ export function ProjectForm({ project }: { project?: AdminProject }) {
           <Field label="Instrument" htmlFor="pj-instrument" error={errors.instrument}>
             <select {...props("instrument")}>
               <option value="">Choisir…</option>
-              {Object.entries(INSTRUMENTS).map(([code, label]) => (
+              {Object.entries(labels.instruments).map(([code, label]) => (
                 <option key={code} value={code}>
                   {label}
                 </option>
@@ -133,7 +140,7 @@ export function ProjectForm({ project }: { project?: AdminProject }) {
             <select {...props("status")} defaultValue={value("status") || "draft"}>
               {STATUS_ORDER.map((status) => (
                 <option key={status} value={status}>
-                  {STATUSES[status]} — {STATUS_HINTS[status]}
+                  {labels.statuses[status]} — {STATUS_HINTS[status]}
                 </option>
               ))}
             </select>
@@ -146,6 +153,56 @@ export function ProjectForm({ project }: { project?: AdminProject }) {
           <input type="checkbox" name="is_demo" defaultChecked={value("is_demo") === "on"} className="size-4 accent-azur-700" />
           Projet d&apos;exemple (affiche le badge « Exemple » et l&apos;avertissement)
         </label>
+      </Card>
+
+      <Card title="Traductions">
+        <p className="text-sm text-muted">
+          Les textes ci-dessus sont en français. Remplissez les autres langues ici : un champ vide affiche le texte
+          français.
+        </p>
+        <div className="space-y-2">
+          {TRANSLATED_LOCALES.map((locale) => {
+            const dir = LOCALE_INFO[locale].dir;
+            const filled = ["title", "tagline", "description"].some((field) => value(`tr_${locale}_${field}`));
+            const field = (name: string) => ({ ...props(`tr_${locale}_${name}`), dir });
+            return (
+              <details key={locale} className="group rounded-xl border border-sand-200">
+                <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-ink">
+                  <span>
+                    {LOCALE_INFO[locale].name} <span className="text-muted uppercase">({locale})</span>
+                  </span>
+                  <span className={`text-xs ${filled ? "text-olive-600" : "text-muted"}`}>
+                    {filled ? "Traduit" : "Non traduit"}
+                  </span>
+                </summary>
+                <div className="space-y-4 border-t border-sand-200 p-4">
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <Field label="Titre" htmlFor={`pj-tr_${locale}_title`}>
+                      <input {...field("title")} />
+                    </Field>
+                    <Field label="Accroche" htmlFor={`pj-tr_${locale}_tagline`}>
+                      <input {...field("tagline")} maxLength={160} />
+                    </Field>
+                    <Field label="Ville" htmlFor={`pj-tr_${locale}_city`}>
+                      <input {...field("city")} />
+                    </Field>
+                  </div>
+                  <Field label="Description" htmlFor={`pj-tr_${locale}_description`}>
+                    <textarea {...field("description")} rows={5} />
+                  </Field>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Points forts (un par ligne)" htmlFor={`pj-tr_${locale}_highlights`}>
+                      <textarea {...field("highlights")} rows={3} />
+                    </Field>
+                    <Field label="Risques (un par ligne)" htmlFor={`pj-tr_${locale}_risks`}>
+                      <textarea {...field("risks")} rows={3} />
+                    </Field>
+                  </div>
+                </div>
+              </details>
+            );
+          })}
+        </div>
       </Card>
 
       <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-4 border-t border-sand-200 bg-sand-50/95 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border">

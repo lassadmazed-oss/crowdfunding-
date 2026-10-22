@@ -10,11 +10,13 @@ export function BrickMark({ className = "size-8" }: { className?: string }) {
   );
 }
 
-export function Logo() {
+export function Logo({ href, label }: { href: string; label: string }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label="Lebna, accueil">
+    <Link href={href} className="flex shrink-0 items-center gap-2.5" aria-label={label}>
       <BrickMark />
-      <span className="font-display text-2xl font-semibold tracking-tight text-azur-900">Lebna</span>
+      <span className="font-display text-xl font-semibold tracking-tight text-azur-900 sm:text-2xl" dir="ltr">
+        Lebna
+      </span>
       <span className="hidden font-display text-lg text-terra-500 sm:inline" lang="ar" dir="rtl">
         لبنة
       </span>

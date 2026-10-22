@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getAdminInvestors, requireAdmin } from "@/lib/admin";
-import { COUNTRIES, KYC, formatTND, isOneOf, labelOf, type KycStatus } from "@/lib/domain";
+import { KYC_STATUSES, isOneOf, labelFor, type KycStatus } from "@/lib/domain";
+import { formatTND, labels } from "../admin-i18n";
 import { EmptyRow, KycBadge, PageTitle, Table, TableSkeleton, formatDateTime } from "../admin-ui";
 
 export const metadata: Metadata = { title: "Investisseurs" };
@@ -29,7 +30,7 @@ export default function InvestorsPage(props: PageProps<"/admin/investisseurs">) 
 async function InvestorsTable({ searchParams }: Pick<PageProps<"/admin/investisseurs">, "searchParams">) {
   await requireAdmin();
   const { statut } = await searchParams;
-  const active = statut === "tous" ? "tous" : isOneOf(statut, Object.keys(KYC) as KycStatus[]) ? statut : "pending_review";
+  const active = statut === "tous" ? "tous" : isOneOf(statut, KYC_STATUSES) ? statut : "pending_review";
   const all = await getAdminInvestors();
 
   const counts = Object.fromEntries(TABS.map((tab) => [tab.key, 0])) as Record<KycStatus | "tous", number>;
@@ -76,7 +77,7 @@ async function InvestorsTable({ searchParams }: Pick<PageProps<"/admin/investiss
                 <span className="block text-xs text-muted">{investor.email}</span>
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-ink-soft">
-                {investor.residency === "non_resident" ? labelOf(COUNTRIES, investor.country) : investor.residency ? "Tunisie" : "—"}
+                {investor.residency === "non_resident" ? labelFor(labels.countries, investor.country) : investor.residency ? "Tunisie" : "—"}
               </td>
               <td className="px-4 py-3">
                 <KycBadge status={investor.kyc_status} />

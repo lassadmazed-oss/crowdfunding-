@@ -1,27 +1,29 @@
 import Link from "next/link";
 import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { getCurrentUser, getInvestorProfile, getMyIntents } from "@/lib/auth";
 import { isCollecting, type Project } from "@/lib/domain";
 import { IntentForm } from "./intent-form";
 
 // What the visitor can do on a project depends on who they are, so this part renders per request.
-export async function IntentPanel({ project }: { project: Project }) {
+export async function IntentPanel({ project, t, locale }: { project: Project; t: Dictionary; locale: Locale }) {
   if (!isCollecting(project.status)) {
-    return <Panel title="Collecte terminée">Ce projet ne recueille plus d&apos;intentions.</Panel>;
+    return <Panel title={t.intent.closedTitle}>{t.intent.closedText}</Panel>;
   }
 
   const user = await getCurrentUser();
-  const next = encodeURIComponent(`/projets/${project.slug}`);
+  const next = encodeURIComponent(`/${locale}/projets/${project.slug}`);
   if (!user) {
     return (
-      <Panel title="Intéressé par ce projet ?">
-        <p>Créez votre compte investisseur pour déclarer une intention, sans engagement.</p>
+      <Panel title={t.intent.guestTitle}>
+        <p>{t.intent.guestText}</p>
         <div className="mt-4 grid gap-2">
-          <Link href="/inscription" className={buttonClass}>
-            Créer un compte
+          <Link href={`/${locale}/inscription`} className={buttonClass}>
+            {t.intent.createAccount}
           </Link>
-          <Link href={`/connexion?next=${next}`} className={secondaryButtonClass}>
-            J&apos;ai déjà un compte
+          <Link href={`/${locale}/connexion?next=${next}`} className={secondaryButtonClass}>
+            {t.intent.haveAccount}
           </Link>
         </div>
       </Panel>
@@ -31,24 +33,26 @@ export async function IntentPanel({ project }: { project: Project }) {
   const profile = await getInvestorProfile();
   if (!profile || profile.kyc_status === "incomplete") {
     return (
-      <Panel title="Dernière étape">
-        <p>Complétez votre questionnaire investisseur pour déclarer une intention sur ce projet.</p>
-        <Link href="/espace/profil" className={`${buttonClass} mt-4 w-full`}>
-          Compléter mon profil
+      <Panel title={t.intent.incompleteTitle}>
+        <p>{t.intent.incompleteText}</p>
+        <Link href={`/${locale}/espace/profil`} className={`${buttonClass} mt-4 w-full`}>
+          {t.intent.completeProfile}
         </Link>
       </Panel>
     );
   }
   if (profile.kyc_status === "rejected") {
-    return <Panel title="Profil non validé">Contactez-nous pour en savoir plus sur votre profil.</Panel>;
+    return <Panel title={t.intent.rejectedTitle}>{t.intent.rejectedText}</Panel>;
   }
 
   const intents = await getMyIntents();
   const current = intents.find((intent) => intent.project.id === project.id);
 
   return (
-    <Panel title={current ? "Votre intention" : "Déclarer mon intention"}>
+    <Panel title={current ? t.intent.yourIntent : t.intent.declareTitle}>
       <IntentForm
+        locale={locale}
+        t={t.intent}
         projectId={project.id}
         slug={project.slug}
         minTicket={project.min_ticket}

@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { InvestorProfile, ProjectStatus } from "@/lib/domain";
+import type { InvestorProfile, Project, ProjectStatus } from "@/lib/domain";
 
 // Data access layer for the signed-in investor. Every read goes through RLS as that user.
 
@@ -38,7 +38,14 @@ export type MyIntent = {
   id: string;
   amount: number;
   created_at: string;
-  project: { id: string; slug: string; title: string; city: string; status: ProjectStatus };
+  project: {
+    id: string;
+    slug: string;
+    title: string;
+    city: string;
+    status: ProjectStatus;
+    translations: Project["translations"];
+  };
 };
 
 export const getMyIntents = cache(async (): Promise<MyIntent[]> => {
@@ -48,7 +55,7 @@ export const getMyIntents = cache(async (): Promise<MyIntent[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("investment_intents")
-    .select("id, amount, created_at, project:projects!inner(id, slug, title, city, status)")
+    .select("id, amount, created_at, project:projects!inner(id, slug, title, city, status, translations)")
     .eq("investor_id", user.id)
     .order("created_at", { ascending: false })
     .overrideTypes<MyIntent[], { merge: false }>();

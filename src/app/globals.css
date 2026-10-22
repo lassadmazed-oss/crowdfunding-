@@ -32,9 +32,33 @@
   --color-amber-700: #8a5a0b;
 }
 
-@theme inline {
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-fraunces);
+/* Not `inline`: utilities read these variables at runtime, so Arabic pages can swap the fonts below. */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+}
+
+html:lang(ar) {
+  --font-sans: var(--font-arabic), var(--font-inter), sans-serif;
+  --font-display: var(--font-arabic-display), var(--font-fraunces), serif;
+}
+
+/* German and Italian compound words are long: let headings hyphenate rather than overflow on phones. */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Arabic script needs more line height and no letter-spacing tweaks. */
+html:lang(ar) body {
+  line-height: 1.7;
+}
+
+html:lang(ar) .tracking-tight,
+html:lang(ar) .tracking-wide {
+  letter-spacing: normal;
 }
 
 html {

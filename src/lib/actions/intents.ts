@@ -1,18 +1,25 @@
 "use server";
 
 import { refresh, updateTag } from "next/cache";
+import { DEFAULT_LOCALE, hasLocale } from "@/i18n/config";
+import { loadDictionary } from "@/i18n/dictionaries";
+import { fill, formatTND } from "@/i18n/format";
 import { getCurrentUser } from "@/lib/auth";
 import { getProjectBySlug } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
-import { formatTND, isCollecting, parseAmount, type FormState } from "@/lib/domain";
+import { isCollecting, parseAmount, type FormState } from "@/lib/domain";
 
 export async function saveIntent(_prev: FormState, formData: FormData): Promise<FormState> {
+  const lang = formData.get("lang");
+  const locale = hasLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = (await loadDictionary(locale)).intent;
+
   const user = await getCurrentUser();
-  if (!user) return { status: "error", message: "Connectez-vous pour déclarer une intention." };
+  if (!user) return { status: "error", message: t.errors.login };
 
   const project = await getProjectBySlug(String(formData.get("slug") ?? ""));
   if (!project || !isCollecting(project.status)) {
-    return { status: "error", message: "Ce projet ne recueille plus d'intentions." };
+    return { status: "error", message: t.errors.closed };
   }
 
   const raw = String(formData.get("amount") ?? "");
@@ -21,7 +28,12 @@ export async function saveIntent(_prev: FormState, formData: FormData): Promise<
   if (!Number.isFinite(amount) || amount < project.min_ticket || amount > project.target_amount) {
     return {
       status: "error",
-      errors: { amount: `Entre ${formatTND(project.min_ticket)} et ${formatTND(project.target_amount)}.` },
+      errors: {
+        amount: fill(t.errors.range, {
+          min: formatTND(project.min_ticket, locale),
+          max: formatTND(project.target_amount, locale),
+        }),
+      },
       values,
     };
   }
@@ -40,19 +52,12 @@ export async function saveIntent(_prev: FormState, formData: FormData): Promise<
 
   if (error) {
     // RLS rejects intents from investors whose questionnaire isn't complete.
-    const message =
-      error.code === "42501"
-        ? "Complétez votre profil investisseur avant de déclarer une intention."
-        : "L'enregistrement a échoué. Réessayez.";
-    return { status: "error", message, values };
+    return { status: "error", message: error.code === "42501" ? t.errors.profile : t.errors.failed, values };
   }
 
   updateTag("interest");
   refresh();
-  return {
-    status: "success",
-    message: `Intention enregistrée : ${formatTND(amount)}. Elle reste non engageante.`,
-  };
+  return { status: "success", message: fill(t.success, { amount: formatTND(amount, locale) }) };
 }
 
 export async function withdrawIntent(formData: FormData) {

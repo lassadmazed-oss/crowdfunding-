@@ -2,58 +2,75 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ProjectCard } from "@/components/project-card";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries";
+import { getDictionary, getLocale } from "@/i18n/server";
 import { getProjectInterest, getPublishedProjects } from "@/lib/data";
-import { MODELS, MODEL_ORDER, isOneOf } from "@/lib/domain";
+import { MODEL_ORDER, isOneOf, localizeProject } from "@/lib/domain";
 
-export const metadata: Metadata = {
-  title: "Projets",
-  description: "Les projets immobiliers présentés sur Lebna : promoteurs, locatif, propriété progressive, maisons d'hôtes.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getDictionary();
+  return { title: t.projects.metaTitle, description: t.projects.metaDescription };
+}
 
-export default function ProjectsPage(props: PageProps<"/projets">) {
+export default async function ProjectsPage(props: PageProps<"/[lang]/projets">) {
+  const [t, locale] = await Promise.all([getDictionary(), getLocale()]);
   return (
     <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="max-w-2xl space-y-3">
-        <h1 className="font-display text-4xl font-semibold text-azur-900">Projets</h1>
-        <p className="text-ink-soft">
-          Les projets marqués « Exemple » sont fictifs : ils illustrent ce que vous pourrez financer sur Lebna. Les
-          intentions que vous déclarez restent non engageantes.
-        </p>
+        <h1 className="font-display text-4xl font-semibold text-azur-900">{t.projects.title}</h1>
+        <p className="text-ink-soft">{t.projects.intro}</p>
       </div>
       <Suspense fallback={<GridSkeleton />}>
-        <ProjectGrid searchParams={props.searchParams} />
+        <ProjectGrid searchParams={props.searchParams} t={t} locale={locale} />
       </Suspense>
     </main>
   );
 }
 
-async function ProjectGrid({ searchParams }: Pick<PageProps<"/projets">, "searchParams">) {
+async function ProjectGrid({
+  searchParams,
+  t,
+  locale,
+}: Pick<PageProps<"/[lang]/projets">, "searchParams"> & { t: Dictionary; locale: Locale }) {
   const { modele } = await searchParams;
   const active = isOneOf(modele, MODEL_ORDER) ? modele : null;
   const [projects, interest] = await Promise.all([getPublishedProjects(), getProjectInterest()]);
   const visible = active ? projects.filter((project) => project.model === active) : projects;
+  const base = `/${locale}/projets`;
 
   return (
     <>
-      <nav className="mt-8 flex flex-wrap gap-2" aria-label="Filtrer par type de projet">
-        <FilterChip href="/projets" active={!active} label="Tous" />
+      <nav className="mt-8 flex flex-wrap gap-2" aria-label={t.projects.filterLabel}>
+        <FilterChip href={base} active={!active} label={t.projects.filterAll} />
         {MODEL_ORDER.map((model) => (
-          <FilterChip key={model} href={`/projets?modele=${model}`} active={active === model} label={MODELS[model].label} />
+          <FilterChip
+            key={model}
+            href={`${base}?modele=${model}`}
+            active={active === model}
+            label={t.labels.models[model].label}
+          />
         ))}
       </nav>
       {visible.length > 0 ? (
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {visible.map((project) => (
-            <ProjectCard key={project.id} project={project} interest={interest[project.id]} />
+            <ProjectCard
+              key={project.id}
+              project={localizeProject(project, locale)}
+              interest={interest[project.id]}
+              locale={locale}
+              t={t}
+            />
           ))}
         </div>
       ) : (
         <p className="mt-8 rounded-2xl border border-dashed border-sand-300 p-10 text-center text-muted">
-          Aucun projet de ce type pour le moment.{" "}
-          <Link href="/#liste-attente" className="font-semibold text-azur-700">
-            Rejoignez la liste d&apos;attente
+          {t.projects.empty}{" "}
+          <Link href={`/${locale}#liste-attente`} className="font-semibold text-azur-700">
+            {t.projects.emptyLink}
           </Link>{" "}
-          pour être prévenu.
+          {t.projects.emptyAfter}
         </p>
       )}
     </>

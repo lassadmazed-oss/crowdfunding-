@@ -1,0 +1,62 @@
+{
+  "residence-yasmine-ennasr": {
+    "title": "Yasmine Residence",
+    "tagline": "Funding the completion of 24 apartments in Ennasr",
+    "description": "The structural work is complete and 60% of the units are already reserved. The funds top up the equity the bank requires to finance the finishing works. Investors are repaid as the apartments are sold.",
+    "highlights": [
+      "Structural work complete",
+      "60% of units reserved",
+      "First-ranking mortgage guarantee (planned)"
+    ],
+    "risks": [
+      "Construction or sales delays",
+      "Developer default",
+      "Capital not guaranteed; no resale before maturity"
+    ]
+  },
+  "dar-diaspora-sahloul": {
+    "title": "Dar Diaspora — Sahloul",
+    "tagline": "6 furnished apartments to let near the universities of Sousse",
+    "description": "A project company buys six apartments and lets them to students and young professionals. Net rental income is distributed every year; the apartments are sold at maturity.",
+    "highlights": [
+      "Strong student rental demand",
+      "Professional letting management",
+      "Open to Tunisians living abroad"
+    ],
+    "risks": [
+      "Rental vacancy",
+      "Fall in resale prices",
+      "Currency risk for non-resident investors"
+    ]
+  },
+  "sakan-step-sfax": {
+    "title": "Sakan Step — Sfax El Jadida",
+    "tagline": "Three families become homeowners step by step",
+    "description": "The company buys three apartments. Each family pays rent and buys shares in its home every month until it owns it outright. Sukuk structure, compliant with Islamic finance.",
+    "highlights": [
+      "Home ownership without a bank loan",
+      "Regular income",
+      "Sukuk structure"
+    ],
+    "risks": [
+      "Payment default by a family",
+      "Legal framework for rent-to-own still to be confirmed",
+      "Long term (10 years)"
+    ]
+  },
+  "dar-medina-tunis": {
+    "title": "Dar Lebna — Medina of Tunis",
+    "tagline": "Restoring a traditional house as a guest house",
+    "description": "Restoration of a 19th-century dar (traditional courtyard house) into an 8-room guest house, run by a specialist operator. Investors receive a share of the operating profit.",
+    "highlights": [
+      "Architectural heritage",
+      "Growing cultural tourism",
+      "Experienced operator"
+    ],
+    "risks": [
+      "Seasonal tourism",
+      "Restoration budget overrun",
+      "Heritage permits"
+    ]
+  }
+}

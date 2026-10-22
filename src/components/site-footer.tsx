@@ -1,40 +1,37 @@
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { Logo } from "@/components/brand";
+import { getDictionary, getLocale } from "@/i18n/server";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const [t, locale] = await Promise.all([getDictionary(), getLocale()]);
+
   return (
     <footer className="border-t border-sand-200 bg-sand-100">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-3">
-          <Logo />
-          <p className="max-w-sm text-sm leading-relaxed text-muted">
-            Financement participatif immobilier pour les Tunisiens, en Tunisie et à l&apos;étranger. Plateforme en
-            cours de constitution, dans le cadre de la loi n° 2020-37 du 6 août 2020.
-          </p>
+          <Logo href={`/${locale}`} label={t.common.homeLabel} />
+          <p className="max-w-sm text-sm leading-relaxed text-muted">{t.footer.tagline}</p>
         </div>
         <div className="space-y-2 text-sm">
-          <p className="font-semibold text-ink">Plateforme</p>
-          <Link href="/projets" className="block text-muted hover:text-ink">
-            Projets
+          <p className="font-semibold text-ink">{t.footer.platform}</p>
+          <Link href={`/${locale}/projets`} className="block text-muted hover:text-ink">
+            {t.footer.projects}
           </Link>
-          <Link href="/#fonctionnement" className="block text-muted hover:text-ink">
-            Comment ça marche
+          <Link href={`/${locale}#fonctionnement`} className="block text-muted hover:text-ink">
+            {t.footer.howItWorks}
           </Link>
-          <Link href="/#liste-attente" className="block text-muted hover:text-ink">
-            Liste d&apos;attente
+          <Link href={`/${locale}#liste-attente`} className="block text-muted hover:text-ink">
+            {t.footer.waitlist}
           </Link>
         </div>
         <div className="space-y-2 text-sm">
-          <p className="font-semibold text-ink">Avertissement</p>
-          <p className="leading-relaxed text-muted">
-            Investir dans l&apos;immobilier comporte un risque de perte en capital et d&apos;illiquidité. Les
-            rendements affichés sont des objectifs, non garantis.
-          </p>
+          <p className="font-semibold text-ink">{t.footer.warningTitle}</p>
+          <p className="leading-relaxed text-muted">{t.footer.warningText}</p>
         </div>
       </div>
       <p className="border-t border-sand-200 py-4 text-center text-xs text-muted">
-        © <CurrentYear /> Lebna · Tunis
+        © <CurrentYear /> Lebna · {t.footer.city}
       </p>
     </footer>
   );

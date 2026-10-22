@@ -1,5 +1,6 @@
 import { isAdmin, WAITLIST_COLUMNS, type WaitlistEntry } from "@/lib/admin";
-import { COUNTRIES, MODELS, TICKET_RANGES, labelOf, type ProjectModel } from "@/lib/domain";
+import { labelFor, type ProjectModel } from "@/lib/domain";
+import { labels } from "../../admin-i18n";
 import { createClient } from "@/lib/supabase/server";
 
 // CSV export of the whole waitlist, formatted for Excel in French (semicolons, UTF-8 BOM).
@@ -26,9 +27,9 @@ export async function GET() {
       row.email,
       row.full_name ?? "",
       row.residency === "resident" ? "Tunisie" : "Étranger",
-      labelOf(COUNTRIES, row.country),
-      row.ticket_range ? labelOf(TICKET_RANGES, row.ticket_range) : "",
-      row.interests.map((model) => MODELS[model as ProjectModel]?.label ?? model).join(", "),
+      labelFor(labels.countries, row.country),
+      row.ticket_range ? labelFor(labels.ticketRanges, row.ticket_range) : "",
+      row.interests.map((model) => labels.models[model as ProjectModel]?.label ?? model).join(", "),
       row.prefers_sukuk ? "Oui" : "Non",
       row.source ?? "",
       row.created_at,
@@ -36,7 +37,7 @@ export async function GET() {
       .map(csvCell)
       .join(";"),
   );
-  const csv = "﻿" + [header.map(csvCell).join(";"), ...lines].join("\r\n");
+  const csv = "\uFEFF" + [header.map(csvCell).join(";"), ...lines].join("\r\n");
   const date = new Date().toISOString().slice(0, 10);
 
   return new Response(csv, {

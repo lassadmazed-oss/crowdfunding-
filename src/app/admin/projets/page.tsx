@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/project-card";
 import { buttonClass } from "@/components/ui";
 import { getAdminProjects, requireAdmin } from "@/lib/admin";
 import { getProjectInterest } from "@/lib/data";
-import { MODELS, formatTND } from "@/lib/domain";
+import { formatTND, labels } from "../admin-i18n";
 import { EmptyRow, PageTitle, Table, TableSkeleton, formatDateTime } from "../admin-ui";
 
 export const metadata: Metadata = { title: "Projets" };
@@ -51,9 +51,9 @@ async function ProjectsTable() {
                   {project.is_demo ? " · exemple" : ""}
                 </span>
               </td>
-              <td className="px-4 py-3 text-ink-soft">{MODELS[project.model].label}</td>
+              <td className="px-4 py-3 text-ink-soft">{labels.models[project.model].label}</td>
               <td className="px-4 py-3">
-                <StatusBadge status={project.status} />
+                <StatusBadge status={project.status} label={labels.statuses[project.status]} />
               </td>
               <td className="px-4 py-3 whitespace-nowrap">{formatTND(project.target_amount)}</td>
               <td className="px-4 py-3 whitespace-nowrap">

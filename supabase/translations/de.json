@@ -1,0 +1,62 @@
+{
+  "residence-yasmine-ennasr": {
+    "title": "Résidence Yasmine",
+    "tagline": "Die Fertigstellung von 24 Wohnungen in Ennasr finanzieren",
+    "description": "Der Rohbau ist abgeschlossen und 60 % der Wohneinheiten sind bereits reserviert. Die Mittel ergänzen das Eigenkapital, das die Bank für die Finanzierung des Innenausbaus verlangt. Die Rückzahlung an die Anleger erfolgt beim Verkauf der Wohnungen.",
+    "highlights": [
+      "Rohbau abgeschlossen",
+      "60 % der Wohneinheiten reserviert",
+      "Erstrangige Hypothek als Sicherheit (geplant)"
+    ],
+    "risks": [
+      "Verzögerungen beim Bau oder beim Verkauf",
+      "Ausfall des Bauträgers",
+      "Kapital nicht garantiert, kein Weiterverkauf vor Laufzeitende"
+    ]
+  },
+  "dar-diaspora-sahloul": {
+    "title": "Dar Diaspora — Sahloul",
+    "tagline": "6 möblierte Mietwohnungen nahe den Universitäten von Sousse",
+    "description": "Eine Projektgesellschaft kauft sechs Wohnungen und vermietet sie an Studierende und junge Berufstätige. Die Nettomieteinnahmen werden jährlich ausgeschüttet; am Laufzeitende werden die Wohnungen wieder verkauft.",
+    "highlights": [
+      "Hohe Mietnachfrage von Studierenden",
+      "Ausgelagerte Mietverwaltung",
+      "Auch für im Ausland lebende Tunesier zugänglich"
+    ],
+    "risks": [
+      "Leerstand",
+      "Sinkende Preise beim Wiederverkauf",
+      "Wechselkursrisiko für nicht in Tunesien ansässige Anleger"
+    ]
+  },
+  "sakan-step-sfax": {
+    "title": "Sakan Step — Sfax El Jadida",
+    "tagline": "Drei Familien werden Schritt für Schritt Eigentümer",
+    "description": "Die Gesellschaft kauft drei Wohnungen. Jede Familie zahlt Miete und erwirbt jeden Monat Anteile, bis sie vollständig Eigentümerin ihrer Wohnung ist. Sukuk-Struktur, im Einklang mit den Grundsätzen des islamischen Finanzwesens.",
+    "highlights": [
+      "Wohneigentum ohne Bankkredit",
+      "Regelmäßige Erträge",
+      "Sukuk-Struktur"
+    ],
+    "risks": [
+      "Zahlungsausfall einer Familie",
+      "Rechtsrahmen für den Mietkauf muss noch bestätigt werden",
+      "Lange Laufzeit (10 Jahre)"
+    ]
+  },
+  "dar-medina-tunis": {
+    "title": "Dar Lebna — Medina von Tunis",
+    "tagline": "Ein traditionelles Haus restaurieren und als Gästehaus betreiben",
+    "description": "Restaurierung eines traditionellen Hauses (Dar) aus dem 19. Jahrhundert zu einem Gästehaus mit 8 Zimmern, geführt von einem spezialisierten Betreiber. Die Anleger erhalten einen Anteil am Betriebsergebnis.",
+    "highlights": [
+      "Architektonisches Kulturerbe",
+      "Wachsender Kulturtourismus",
+      "Erfahrener Betreiber"
+    ],
+    "risks": [
+      "Saisonabhängigkeit des Tourismus",
+      "Überschreitung des Restaurierungsbudgets",
+      "Denkmalschutzrechtliche Genehmigungen"
+    ]
+  }
+}

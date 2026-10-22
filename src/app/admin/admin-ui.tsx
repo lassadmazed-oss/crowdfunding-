@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { KycStatus } from "@/lib/domain";
-import { KYC } from "@/lib/domain";
+import { labels } from "./admin-i18n";
 
 // Small presentational pieces shared by the back-office pages.
 
@@ -55,7 +55,7 @@ const KYC_TONES: Record<KycStatus, string> = {
 export function KycBadge({ status }: { status: KycStatus }) {
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${KYC_TONES[status]}`}>
-      {KYC[status].label}
+      {labels.kyc[status].label}
     </span>
   );
 }

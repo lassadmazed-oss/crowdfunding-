@@ -2,6 +2,7 @@
 
 import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { CONTENT_LOCALE, LOCALES, type Locale } from "@/i18n/config";
 import { isAdmin, isUuid } from "@/lib/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -12,6 +13,7 @@ import {
   parseAmount,
   type FormState,
   type Instrument,
+  type ProjectText,
 } from "@/lib/domain";
 
 // Every action re-checks admin rights; the database refuses the writes for anyone else anyway.
@@ -61,7 +63,27 @@ export async function saveProject(_prev: FormState, formData: FormData): Promise
     risks: String(formData.get("risks") ?? ""),
     opens_on: field("opens_on", 10),
     is_demo: formData.get("is_demo") === "on" ? "on" : "",
-  };
+  } as Record<string, string>;
+
+  // Texts in the other languages, from fields named tr_<locale>_<field>; empty ones are left out.
+  const translations: Partial<Record<Locale, Partial<ProjectText>>> = {};
+  for (const locale of LOCALES.filter((code) => code !== CONTENT_LOCALE)) {
+    const raw = (name: string, max: number) => {
+      const text = String(formData.get(`tr_${locale}_${name}`) ?? "").trim().slice(0, max);
+      values[`tr_${locale}_${name}`] = text;
+      return text;
+    };
+    const text: Partial<ProjectText> = {
+      title: raw("title", 120),
+      tagline: raw("tagline", 160),
+      city: raw("city", 80),
+      description: raw("description", 5000),
+      highlights: lines(raw("highlights", 3000)),
+      risks: lines(raw("risks", 3000)),
+    };
+    const filled = Object.entries(text).filter(([, value]) => (Array.isArray(value) ? value.length > 0 : Boolean(value)));
+    if (filled.length > 0) translations[locale] = Object.fromEntries(filled);
+  }
   const slug = values.slug ? slugify(values.slug) : slugify(values.title);
   const targetAmount = parseAmount(values.target_amount);
   const minTicket = parseAmount(values.min_ticket);
@@ -113,6 +135,7 @@ export async function saveProject(_prev: FormState, formData: FormData): Promise
     risks,
     opens_on: values.opens_on || null,
     is_demo: values.is_demo === "on",
+    translations,
   };
 
   const supabase = await createClient();
