@@ -465,6 +465,15 @@ const fr = {
     },
   },
 
+  install: {
+    title: "Installer Lebna sur votre téléphone",
+    text: "Retrouvez vos projets en un geste, comme une application.",
+    button: "Installer",
+    ios: "Appuyez sur {share} Partager, puis « Sur l'écran d'accueil ».",
+    android: "Ouvrez le menu du navigateur, puis « Installer l'application » ou « Ajouter à l'écran d'accueil ».",
+    close: "Fermer",
+  },
+
   notFound: {
     title: "Page introuvable",
     text: "Il manque une brique : cette page n'existe pas ou plus.",

@@ -463,6 +463,15 @@ const de: Dictionary = {
     },
   },
 
+  install: {
+    title: "Lebna auf Ihrem Handy installieren",
+    text: "Öffnen Sie Ihre Projekte mit einem Fingertipp – wie eine App.",
+    button: "Installieren",
+    ios: "Tippen Sie auf {share} Teilen und dann auf „Zum Home-Bildschirm“.",
+    android: "Öffnen Sie das Browsermenü und wählen Sie „App installieren“ oder „Zum Startbildschirm hinzufügen“.",
+    close: "Schließen",
+  },
+
   notFound: {
     title: "Seite nicht gefunden",
     text: "Hier fehlt ein Stein: Diese Seite existiert nicht oder nicht mehr.",

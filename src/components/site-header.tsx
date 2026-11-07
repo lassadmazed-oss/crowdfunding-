@@ -13,7 +13,10 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-sand-200/80 bg-sand-50/90 backdrop-blur">
-      <p className="bg-azur-900 px-4 py-1.5 text-center text-xs leading-relaxed text-azur-100">{t.header.banner}</p>
+      {/* safe-top: on an installed iPhone the white status bar text sits on this dark strip. */}
+      <div className="bg-azur-900 safe-top">
+        <p className="px-4 py-1.5 text-center text-xs leading-relaxed text-azur-100">{t.header.banner}</p>
+      </div>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
         <Logo href={`/${locale}`} label={t.common.homeLabel} />
         <nav className="flex items-center gap-1 text-sm font-medium text-ink-soft sm:gap-2">

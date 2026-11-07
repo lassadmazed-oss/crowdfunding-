@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -12,6 +12,12 @@ const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], axe
 export const metadata: Metadata = {
   title: { default: "Back-office", template: "%s · Back-office Lebna" },
   robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "Lebna", statusBarStyle: "black-translucent" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0e2b4c",
+  viewportFit: "cover",
 };
 
 // Root layout of the back-office (French only, separate from the translated public site).
@@ -19,7 +25,9 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
     <html lang="fr" className={`${inter.variable} ${fraunces.variable} h-full antialiased`}>
-      <body className="min-h-full font-sans">
+      <body className="min-h-full font-sans safe-x safe-bottom">
+        {/* Dark strip under the status bar when installed (white status bar text); empty in a browser. */}
+        <div className="bg-azur-900 safe-top" />
         <header className="border-b border-sand-200 bg-white">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
             <div className="flex items-center gap-3">

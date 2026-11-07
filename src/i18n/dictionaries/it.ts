@@ -463,6 +463,15 @@ const it: Dictionary = {
     },
   },
 
+  install: {
+    title: "Installi Lebna sul suo telefono",
+    text: "Apra i suoi progetti con un tocco, come un'app.",
+    button: "Installa",
+    ios: "Tocchi {share} Condividi, poi «Aggiungi alla schermata Home».",
+    android: "Apra il menu del browser, poi «Installa app» o «Aggiungi a schermata Home».",
+    close: "Chiudi",
+  },
+
   notFound: {
     title: "Pagina non trovata",
     text: "Manca un mattone: questa pagina non esiste o non esiste più.",

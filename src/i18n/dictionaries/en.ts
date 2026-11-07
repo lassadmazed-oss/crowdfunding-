@@ -465,6 +465,15 @@ const en: Dictionary = {
     },
   },
 
+  install: {
+    title: "Install Lebna on your phone",
+    text: "Open your projects in one tap, like an app.",
+    button: "Install",
+    ios: "Tap {share} Share, then “Add to Home Screen”.",
+    android: "Open the browser menu, then “Install app” or “Add to Home screen”.",
+    close: "Close",
+  },
+
   notFound: {
     title: "Page not found",
     text: "A brick is missing: this page does not exist, or no longer exists.",

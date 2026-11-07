@@ -7,7 +7,7 @@ export async function SiteFooter() {
   const [t, locale] = await Promise.all([getDictionary(), getLocale()]);
 
   return (
-    <footer className="border-t border-sand-200 bg-sand-100">
+    <footer className="border-t border-sand-200 bg-sand-100 safe-bottom">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-3">
           <Logo href={`/${locale}`} label={t.common.homeLabel} />
