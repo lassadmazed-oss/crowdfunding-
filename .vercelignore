@@ -1,0 +1,7 @@
+# Never upload local secrets: Vercel injects the project's environment variables at build time.
+.env
+.env.*
+!.env.example
+
+# Local tooling
+.claude
